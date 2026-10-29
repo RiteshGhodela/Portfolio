@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ritesh Ghodela — Frontend Developer</title>
+
+  <!-- Prevent FOUC (flash of unstyled or wrong theme) -->
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <!-- Geist Font (Sans & Mono) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --text: #0A0A0A;
+      --muted: #5C5C5C;
+      --border: #E5E5E5;
+      --card-hover: rgba(0, 0, 0, 0.03);
+    }
+
+    .dark {
+      --bg: #0A0A0A;
+      --text: #FAFAFA;
+      --muted: #A3A3A3;
+      --border: #262626;
+      --card-hover: rgba(255, 255, 255, 0.035);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .font-mono-custom {
+      font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Strict utility bindings to custom CSS properties */
+    .theme-bg { background-color: var(--bg); }
+    .theme-text { color: var(--text); }
+    .theme-muted { color: var(--muted); }
+    .theme-border { border-color: var(--border); }
+
+    /* Universal color and transform transitions */
+    a, button, span, svg, p, div, img {
+      transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease, transform 200ms ease;
+    }
+
+    /* Project row hover state transitions */
+    .project-card:hover .project-thumb-img {
+      transform: scale(1.04);
+    }
+    .project-card:hover .project-thumb-wrapper {
+      border-color: var(--text);
+    }
+    .project-card:hover .project-card-title {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Stack card hover micro-animations (Manu Arora style) */
+    .stack-card {
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease, border-color 200ms ease;
+      border: 1px solid transparent;
+    }
+    .stack-card:hover {
+      background-color: var(--card-hover);
+      border-color: var(--border);
+      transform: translateY(-2px);
+    }
+    .stack-card:hover .stack-icon-wrapper {
+      transform: scale(1.08);
+      border-color: var(--text);
+    }
+
+    /* Active filter tab */
+    .filter-btn.active {
+      background-color: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    /* Subtle focus outline for keyboard accessibility */
+    a:focus-visible, button:focus-visible {
+      outline: 1.5px solid var(--text);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="max-w-[720px] mx-auto px-6 py-12 md:py-16">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between pb-16">
+      <div class="flex items-center space-x-3.5">
+        <!-- 40px Circle Avatar with RG Fallback -->
+        <div class="w-10 h-10 rounded-full overflow-hidden border theme-border flex-shrink-0 relative bg-[var(--bg)] flex items-center justify-center">
+          <img 
+            src="/avatar.jpg" 
+            alt="Ritesh Ghodela" 
+            class="w-full h-full object-cover rounded-full"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="hidden w-full h-full items-center justify-center font-mono-custom text-xs font-medium tracking-tight theme-text select-none bg-neutral-100 dark:bg-neutral-800">
+            RG
+          </div>
+        </div>
+        <div>
+          <span class="block text-sm font-semibold tracking-tight theme-text">Ritesh Ghodela</span>
+          <span class="block text-xs font-mono-custom theme-muted">Frontend Developer</span>
+        </div>
+      </div>
+
+      <!-- Navigation & Theme Toggle -->
+      <div class="flex items-center space-x-5 text-sm">
+        <nav class="hidden sm:flex items-center space-x-4">
+          <a href="#intro" class="theme-muted hover:text-[var(--text)] transition-colors">Home</a>
+          <a href="#showcase" class="theme-muted hover:text-[var(--text)] transition-colors">Showcase</a>
+          <a href="#stack" class="theme-muted hover:text-[var(--text)] transition-colors">Stack</a>
+          <a href="#contact" class="theme-muted hover:text-[var(--text)] transition-colors">Contact</a>
+        </nav>
+
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" type="button" aria-label="Toggle color theme" class="p-2 rounded-md theme-muted hover:text-[var(--text)] transition-colors border theme-border">
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg id="sun-icon" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m14.14-14.14l-1.41 1.41"></path>
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg id="moon-icon" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="space-y-16">
+      <!-- Section 1: Intro -->
+      <section id="intro" class="space-y-4">
+        <div class="space-y-1.5">
+          <h1 class="text-[32px] font-semibold leading-[1.2] tracking-[-0.02em] theme-text">
+            Ritesh Ghodela
+          </h1>
+          <p class="text-xs font-mono-custom theme-muted">
+            Mandsaur, Madhya Pradesh, India
+          </p>
+        </div>
+        <p class="text-[16px] leading-[1.7] theme-muted pt-1">
+          I'm Ritesh, a self-taught frontend developer from Mandsaur, India. I build and deploy web apps with React, <a href="https://nextjs.org" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 decoration-[var(--border)] hover:decoration-[var(--text)] text-[var(--text)] transition-colors">Next.js</a>, TypeScript and Tailwind CSS, and every project below is live on Vercel. I also have a BBA in Finance. I'm open to frontend roles (on-site, hybrid or remote) and can join immediately.
+        </p>
+      </section>
+
+      <!-- Section 2: What I do -->
+      <section class="space-y-0">
+        <h2 class="text-[13px] font-normal font-mono-custom theme-muted mb-6">
+          What I do
+        </h2>
+        <div class="divide-y theme-border border-t border-b">
+          <div class="py-3.5 text-[15px] leading-relaxed">
+            <span class="theme-text font-medium">Frontend development:</span>
+            <span class="theme-muted"> React, Next.js 14 and TypeScript, built with Next.js 14 and TypeScript, deployed on Vercel.</span>
+          </div>
+          <div class="py-3.5 text-[15px] leading-relaxed">
+            <span class="theme-text font-medium">Animated marketing sites:</span>
+            <span class="theme-muted"> GSAP, Framer Motion and Three.js where it helps.</span>
+          </div>
+          <div class="py-3.5 text-[15px] leading-relaxed">
+            <span class="theme-text font-medium">Integrations:</span>
+            <span class="theme-muted"> REST APIs, Supabase (Postgres + Auth), Razorpay orders and webhooks.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Showcase (Grid of Cards inspired by Manu Arora's row layout) -->
+      <section id="showcase" class="space-y-0">
+        <!-- Section Header with Left Monospace Label & Right Arrow Link -->
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-[12px] uppercase font-mono-custom tracking-wider theme-muted">
+            SHOWCASE &middot; SELECTED WORK
+          </h2>
+          <a href="https://github.com/RiteshGhodela" target="_blank" rel="noopener noreferrer" class="text-[12px] font-mono-custom theme-muted hover:text-[var(--text)] transition-colors inline-flex items-center gap-1">
+            All projects ↗
+          </a>
+        </div>
+
+        <!-- 3-Column / Responsive 1-to-3 Column Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+
+          <!-- 1. SolowebHQ -->
+          <article class="project-card group">
+            <a href="https://solowebhq.vercel.app/" target="_blank" rel="noopener noreferrer" class="block space-y-2.5">
+              <div class="project-thumb-wrapper w-full aspect-[16/10] rounded-[10px] overflow-hidden border theme-border bg-[#F5D8C7] relative flex items-center justify-center transition-colors">
+                <img 
+                  src="/projects/solowebhq.png" 
+                  alt="SolowebHQ agency site" 
+                  class="project-thumb-img w-full h-full object-cover transition-transform duration-300 ease-out"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <!-- Rendered Visual Fallback matching screenshot -->
+                <div class="hidden w-full h-full p-3 bg-[#fde2d2] text-[#1c1917] flex-col justify-between select-none">
+                  <div class="flex justify-between items-center text-[9px] font-mono-custom">
+                    <span class="font-bold">S</span>
+                    <span class="opacity-70">Services</span>
+                    <span class="opacity-70">Connect</span>
+                  </div>
+                  <div class="font-serif text-[13px] leading-tight text-[#171717] font-normal line-clamp-3">
+                    Turning coffee into code, dreams into websites
+                  </div>
+                  <div class="flex justify-end gap-1">
+                    <span class="px-1.5 py-0.5 rounded-full text-[8px] font-mono-custom bg-[#bbf451] text-black font-semibold">Demo</span>
+                    <span class="px-1.5 py-0.5 rounded-full text-[8px] font-mono-custom bg-black text-white">Contact</span>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="project-card-title text-[14px] font-medium leading-[1.35] theme-text transition-colors">
+                  SolowebHQ, marketing site for agency
+                </h3>
+                <p class="text-[12px] font-mono-custom theme-muted truncate">
+                  Next.js &middot; GSAP &middot; Live ↗
+                </p>
+              </div>
+            </a>
+          </article>
+
+          <!-- 2. Horloge -->
+          <article class="project-card group">
+            <a href="https://oc-clock.vercel.app/" target="_blank" rel="noopener noreferrer" class="block space-y-2.5">
+              <div class="project-thumb-wrapper w-full aspect-[16/10] rounded-[10px] overflow-hidden border theme-border bg-[#0B0D10] relative flex items-center justify-center transition-colors">
+                <img 
+                  src="/projects/horloge.png" 
+                  alt="Horloge productivity suite" 
+                  class="project-thumb-img w-full h-full object-cover transition-transform duration-300 ease-out"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <!-- Rendered Visual Fallback matching screenshot -->
+                <div class="hidden w-full h-full p-3 bg-[#0a0a0c] text-white flex-col justify-between select-none">
+                  <div class="flex justify-between items-center text-[9px] font-mono-custom opacity-75">
+                    <div class="flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
+                      <span>Clock</span>
+                    </div>
+                    <span class="text-[8px] opacity-60">Full Screen</span>
+                  </div>
+                  <div class="text-center font-mono-custom">
+                    <div class="text-xl font-bold tracking-tight text-white/95">
+                      05<span class="text-[#f97316] animate-pulse">:</span>39
+                    </div>
+                    <div class="text-[7px] tracking-widest text-[#ea580c] uppercase">Asia/Calcutta</div>
+                  </div>
+                  <div class="flex justify-center gap-1 text-[7px] font-mono-custom opacity-60">
+                    <span>Alarm</span>&middot;<span>Timer</span>&middot;<span>Suite</span>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="project-card-title text-[14px] font-medium leading-[1.35] theme-text transition-colors">
+                  Horloge, browser productivity suite
+                </h3>
+                <p class="text-[12px] font-mono-custom theme-muted truncate">
+                  Vanilla JS &middot; HTML &middot; CSS ↗
+                </p>
+              </div>
+            </a>
+          </article>
+
+          <!-- 3. Creative developer portfolio -->
+          <article class="project-card group">
+            <a href="https://creativedesign-puce.vercel.app/" target="_blank" rel="noopener noreferrer" class="block space-y-2.5">
+              <div class="project-thumb-wrapper w-full aspect-[16/10] rounded-[10px] overflow-hidden border theme-border bg-[#c5bfb4] relative flex items-center justify-center transition-colors">
+                <img 
+                  src="/projects/creative-portfolio.png" 
+                  alt="Creative developer portfolio" 
+                  class="project-thumb-img w-full h-full object-cover transition-transform duration-300 ease-out"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <!-- Rendered Visual Fallback matching screenshot -->
+                <div class="hidden w-full h-full p-3 bg-[#cac3b7] text-[#1c1917] flex-col justify-between relative overflow-hidden select-none">
+                  <div class="flex justify-between items-center text-[9px] font-mono-custom">
+                    <span class="italic font-serif font-bold">S.</span>
+                    <span class="opacity-60 text-[8px]">SERVICES &middot; WORK</span>
+                  </div>
+                  <div class="font-serif italic text-base leading-tight text-center text-[#1c1917] my-auto">
+                    Turning chaos into clarity.
+                  </div>
+                  <div class="text-[8px] font-mono-custom opacity-60 text-right">
+                    WebGL &middot; 3D
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="project-card-title text-[14px] font-medium leading-[1.35] theme-text transition-colors">
+                  Creative portfolio with 3D elements
+                </h3>
+                <p class="text-[12px] font-mono-custom theme-muted truncate">
+                  Three.js &middot; GSAP &middot; Next.js ↗
+                </p>
+              </div>
+            </a>
+          </article>
+
+          <!-- 4. Designjoy -->
+          <article class="project-card group">
+            <a href="https://designjoy-xi.vercel.app/" target="_blank" rel="noopener noreferrer" class="block space-y-2.5">
+              <div class="project-thumb-wrapper w-full aspect-[16/10] rounded-[10px] overflow-hidden border theme-border bg-white relative flex items-center justify-center transition-colors">
+                <img 
+                  src="/projects/designjoy.png" 
+                  alt="Designjoy agency landing page" 
+                  class="project-thumb-img w-full h-full object-cover transition-transform duration-300 ease-out"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <!-- Rendered Visual Fallback matching screenshot -->
+                <div class="hidden w-full h-full p-3 bg-white text-black flex-col justify-between select-none">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-[11px] text-neutral-900">Designjoy</span>
+                    <span class="px-2 py-0.5 rounded-full text-[7px] font-semibold bg-[#ff5a1f] text-white">Contact</span>
+                  </div>
+                  <div class="font-bold text-[12px] leading-tight text-neutral-950 line-clamp-3">
+                    Make your online presence a reality with us!
+                  </div>
+                  <div class="h-3 rounded-t bg-black w-full mt-auto opacity-95"></div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="project-card-title text-[14px] font-medium leading-[1.35] theme-text transition-colors">
+                  Designjoy, agency landing page
+                </h3>
+                <p class="text-[12px] font-mono-custom theme-muted truncate">
+                  Next.js &middot; TypeScript &middot; Live ↗
+                </p>
+              </div>
+            </a>
+          </article>
+
+          <!-- 5. Personal portfolio -->
+          <article class="project-card group">
+            <a href="https://my-resume-88xv.vercel.app/" target="_blank" rel="noopener noreferrer" class="block space-y-2.5">
+              <div class="project-thumb-wrapper w-full aspect-[16/10] rounded-[10px] overflow-hidden border theme-border bg-black relative flex items-center justify-center transition-colors">
+                <img 
+                  src="/projects/personal-portfolio.png" 
+                  alt="Personal portfolio with 3D character" 
+                  class="project-thumb-img w-full h-full object-cover transition-transform duration-300 ease-out"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                <!-- Rendered Visual Fallback matching screenshot -->
+                <div class="hidden w-full h-full p-3 bg-[#030303] text-white flex-col justify-between relative overflow-hidden select-none">
+                  <div class="flex justify-between text-[8px] font-mono-custom text-neutral-400">
+                    <span>ABOUT</span>
+                    <span>PROJECTS</span>
+                    <span>CONTACT</span>
+                  </div>
+                  <div class="text-center my-auto">
+                    <div class="text-xs font-black tracking-tight text-neutral-300 uppercase">
+                      HI, I'M RITESH
+                    </div>
+                    <div class="w-7 h-7 mx-auto my-1 rounded-full bg-gradient-to-tr from-amber-700 via-stone-400 to-indigo-900"></div>
+                  </div>
+                  <div class="flex justify-between items-end text-[7px] font-mono-custom">
+                    <span class="text-neutral-400">Frontend Dev</span>
+                    <span class="text-fuchsia-300">✉ Contact</span>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="project-card-title text-[14px] font-medium leading-[1.35] theme-text transition-colors">
+                  Personal portfolio with GitHub API
+                </h3>
+                <p class="text-[12px] font-mono-custom theme-muted truncate">
+                  Next.js &middot; TypeScript &middot; Live ↗
+                </p>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Section 4: Tech Stack & Tools (Manu Arora 'Companies I worked with' Style) -->
+      <section id="stack" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 class="text-[12px] uppercase font-mono-custom tracking-wider theme-muted">
+            TECH STACK &middot; TOOLS &amp; LIBRARIES
+          </h2>
+
+          <!-- Interactive Category Filter -->
+          <div class="flex items-center gap-1.5 text-xs font-mono-custom">
+            <button onclick="filterStack('all')" class="filter-btn active px-2.5 py-1 rounded-md border theme-border transition-all" data-category="all">
+              All
+            </button>
+            <button onclick="filterStack('frontend')" class="filter-btn px-2.5 py-1 rounded-md border theme-border text-[var(--muted)] hover:text-[var(--text)] transition-all" data-category="frontend">
+              Frontend
+            </button>
+            <button onclick="filterStack('backend')" class="filter-btn px-2.5 py-1 rounded-md border theme-border text-[var(--muted)] hover:text-[var(--text)] transition-all" data-category="backend">
+              Backend
+            </button>
+            <button onclick="filterStack('tools')" class="filter-btn px-2.5 py-1 rounded-md border theme-border text-[var(--muted)] hover:text-[var(--text)] transition-all" data-category="tools">
+              Tools
+            </button>
+          </div>
+        </div>
+
+        <!-- 3-Column Responsive Grid matching Manu Arora's cards -->
+        <div id="stack-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-7 gap-x-5">
+
+          <!-- 1. Next.js -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="frontend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 theme-text" viewBox="0 0 180 180" fill="none">
+                  <mask id="mask-next" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+                    <circle cx="90" cy="90" r="90" fill="black" />
+                  </mask>
+                  <g mask="url(#mask-next)">
+                    <circle cx="90" cy="90" r="90" fill="currentColor" fill-opacity="0.12" />
+                    <path d="M149.508 157.438L69.1478 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.137 149.508 157.438Z" fill="currentColor" />
+                    <rect x="115" y="54" width="12" height="72" fill="currentColor" />
+                  </g>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Next.js
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              App Router, Server Components &amp; dynamic routing architecture.
+            </p>
+          </div>
+
+          <!-- 2. React -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="frontend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#00D8FE]" viewBox="-11.5 -10.23174 23 20.46348" fill="currentColor">
+                  <circle cx="0" cy="0" r="2.05" />
+                  <g stroke="currentColor" stroke-width="1.2" fill="none">
+                    <ellipse rx="11" ry="4.2" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                  </g>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                React
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Interactive user interfaces with custom hooks and reusable components.
+            </p>
+          </div>
+
+          <!-- 3. TypeScript -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="frontend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-[#3178C6] border border-[#3178C6]/40 flex items-center justify-center flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <span class="text-white font-extrabold text-[13px] tracking-tight">TS</span>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                TypeScript
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Strongly typed JavaScript preventing runtime edge-case bugs.
+            </p>
+          </div>
+
+          <!-- 4. Tailwind CSS -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="frontend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#38BDF8]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 C13.666,10.618,15.027,12,18.001,12c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624 c1.177,1.194,2.538,2.576,5.512,2.576c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624 C10.337,13.382,8.976,12,6.001,12z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Tailwind CSS
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Rapid, responsive layout design system with clean utility classes.
+            </p>
+          </div>
+
+          <!-- 5. GSAP & Motion -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="frontend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <span class="text-[#0AE448] font-black text-sm font-mono">GS</span>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                GSAP &amp; Motion
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              High-performance scroll triggers, timeline sequencing &amp; animations.
+            </p>
+          </div>
+
+          <!-- 6. Supabase -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="backend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#3ECF8E]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21.362 9.354H12V.396a.396.396 0 0 0-.716-.234L.37 14.288a.396.396 0 0 0 .307.636H12v8.68a.396.396 0 0 0 .716.234l10.914-14.126a.396.396 0 0 0-.268-.358z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Supabase
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Managed Postgres, instant real-time data &amp; secure OAuth auth.
+            </p>
+          </div>
+
+          <!-- 7. Node.js -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="backend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#5FA04E]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l9 5.2v10.4L12 23l-9-5.4V7.2L12 2zm0 2.3L4.8 8.5v7l7.2 4.2 7.2-4.2v-7L12 4.3z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Node.js &amp; Express
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Scalable REST API endpoints, routing &amp; server middleware.
+            </p>
+          </div>
+
+          <!-- 8. MongoDB -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="backend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-4 h-5 text-[#00ED64]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.193 9.555c-1.264-5.61-4.221-7.316-4.967-8.925C11.66 2.15 9.07 4.14 7.55 9.555c-1.854 6.604 1.77 10.59 4.385 13.435.107.118.28.118.388 0 2.616-2.845 6.425-6.831 4.87-13.435z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                MongoDB
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Flexible NoSQL document database for modern web applications.
+            </p>
+          </div>
+
+          <!-- 9. Razorpay -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="backend">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-[#0C2340] border border-[#0C2340]/40 flex items-center justify-center flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#0284C7]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22.436 0l-11.91 7.773-3.794 8.243 4.254-2.778 2.052-4.46 5.86-3.824-2.317 7.747h4.896l-7.25 10.985 1.583-3.442h-3.955l-3.855 8.381h3.916l7.733-16.804 3.794-2.478 2.046-4.456z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Razorpay
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Checkout modal integrations, order management &amp; webhooks.
+            </p>
+          </div>
+
+          <!-- 10. Figma -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="tools">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-4 h-5" viewBox="0 0 38 57" fill="none">
+                  <path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="#1ABCFE"/>
+                  <path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="#0ACF83"/>
+                  <path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="#FF7262"/>
+                  <path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="#F24E1E"/>
+                  <path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="#A259FF"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Figma
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Interface wireframing, component design tokens &amp; prototypes.
+            </p>
+          </div>
+
+          <!-- 11. Git & GitHub -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="tools">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-5 h-5 text-[#F05032]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2.6 10.59L8.38 4.8a2.53 2.53 0 013.58 0l1.24 1.24L11.5 7.74a1.88 1.88 0 00-1.88 1.88c0 .24.05.47.13.68L7.8 12.25a1.88 1.88 0 101.4 1.4l1.9-1.9c.22.08.45.13.7.13a1.88 1.88 0 001.88-1.88c0-.36-.11-.7-.3-1l1.7-1.7 6.13 6.13a2.53 2.53 0 010 3.58l-5.78 5.79a2.53 2.53 0 01-3.58 0L2.6 14.17a2.53 2.53 0 010-3.58z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Git &amp; GitHub
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Branching strategies, version control &amp; collaborative PR reviews.
+            </p>
+          </div>
+
+          <!-- 12. Vercel -->
+          <div class="stack-card group rounded-xl p-3 -m-3 flex flex-col justify-start cursor-default" data-category="tools">
+            <div class="flex items-center space-x-3 mb-2">
+              <div class="stack-icon-wrapper w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900 border theme-border flex items-center justify-center p-2 flex-shrink-0 transition-transform duration-200 shadow-sm">
+                <svg class="w-4 h-4 theme-text" viewBox="0 0 1155 1000" fill="currentColor">
+                  <path d="m577.3 0 577.4 1000H0z"/>
+                </svg>
+              </div>
+              <span class="text-[14px] font-semibold tracking-tight theme-text group-hover:text-black dark:group-hover:text-white transition-colors">
+                Vercel
+              </span>
+            </div>
+            <p class="text-[12px] leading-relaxed theme-muted">
+              Edge deployment network, CI/CD pipelines &amp; custom domain setup.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 5: Education -->
+      <section class="space-y-0">
+        <h2 class="text-[13px] font-normal font-mono-custom theme-muted mb-6">
+          Education
+        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between text-[15px] leading-relaxed">
+          <span class="theme-text">BBA, Finance and Financial Management</span>
+          <span class="theme-muted text-sm font-mono-custom sm:text-right">Vikram University, Ujjain &middot; 2018–2021</span>
+        </div>
+      </section>
+
+      <!-- Section 6: Contact -->
+      <section id="contact" class="space-y-0">
+        <h2 class="text-[13px] font-normal font-mono-custom theme-muted mb-6">
+          Get in touch
+        </h2>
+        <div class="space-y-4">
+          <p class="text-[16px] leading-[1.7] theme-muted">
+            I'm looking for a frontend or web developer role. The fastest way to reach me is email.
+          </p>
+          <div class="pt-1">
+            <a href="mailto:riteshghodela52@gmail.com" class="text-xl sm:text-2xl font-medium theme-text underline underline-offset-8 decoration-[var(--border)] hover:decoration-[var(--text)] transition-colors break-all">
+              riteshghodela52@gmail.com
+            </a>
+          </div>
+          <div class="flex items-center space-x-5 text-sm pt-2">
+            <a href="https://github.com/RiteshGhodela" target="_blank" rel="noopener noreferrer" class="theme-muted hover:text-[var(--text)] underline underline-offset-4 decoration-[var(--border)] hover:decoration-[var(--text)]">
+              GitHub ↗
+            </a>
+            <a href="https://linkedin.com/in/riteshghodela" target="_blank" rel="noopener noreferrer" class="theme-muted hover:text-[var(--text)] underline underline-offset-4 decoration-[var(--border)] hover:decoration-[var(--text)]">
+              LinkedIn ↗
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 pt-8 border-t theme-border flex items-center justify-between text-xs font-mono-custom theme-muted">
+      <div>
+        &copy; 2026 Ritesh Ghodela
+      </div>
+      <div>
+        <a href="#intro" class="hover:text-[var(--text)] transition-colors inline-flex items-center gap-1">
+          Back to top ↑
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Theme Toggle & Stack Filter Logic -->
+  <script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    function updateIcons(isDark) {
+      if (isDark) {
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      } else {
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      }
+    }
+
+    // Initialize state
+    const isDarkCurrent = document.documentElement.classList.contains('dark');
+    updateIcons(isDarkCurrent);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const willBeDark = !document.documentElement.classList.contains('dark');
+      if (willBeDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      updateIcons(willBeDark);
+    });
+
+    // Handle OS preference changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+          updateIcons(true);
+        } else {
+          document.documentElement.classList.remove('dark');
+          updateIcons(false);
+        }
+      }
+    });
+
+    // Category filter for Tech Stack
+    function filterStack(category) {
+      const cards = document.querySelectorAll('.stack-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      buttons.forEach(btn => {
+        if (btn.getAttribute('data-category') === category) {
+          btn.classList.add('active');
+          btn.classList.remove('text-[var(--muted)]');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('text-[var(--muted)]');
+        }
+      });
+
+      cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        if (category === 'all' || cardCategory === category) {
+          card.style.display = 'flex';
+          card.style.opacity = '0';
+          setTimeout(() => {
+            card.style.opacity = '1';
+          }, 40);
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
